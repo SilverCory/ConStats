@@ -24,6 +24,8 @@ type Configuration struct {
 
 type WebDataConfiguration struct {
 	CreateWebData bool
+	RunServer     bool
+	Host          string
 }
 
 // MySQLConfiguration - MySQL part..
@@ -40,6 +42,8 @@ var defaultConfiguration = &Configuration{
 	},
 	WebData: &WebDataConfiguration{
 		CreateWebData: true,
+		RunServer:     true,
+		Host:          ":8080",
 	},
 }
 
@@ -54,6 +58,10 @@ func main() {
 	speed := speedtest.Create()
 	speed.Args = CurrentConfig.Args
 	speed.Command = CurrentConfig.Command
+
+	if CurrentConfig.WebData.RunServer {
+		go web.RunWebserver(CurrentConfig.WebData.Host)
+	}
 
 	doTest(speed, mysqlStorage)
 	if _, err := os.Stat("./connectionData.json"); os.IsNotExist(err) {
