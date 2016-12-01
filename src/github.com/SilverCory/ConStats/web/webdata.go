@@ -82,8 +82,6 @@ func GenerateData(storage *sql.MySQL) (*[]Data, error) {
 			download = download / 1000000
 		}
 
-		fmt.Printf("%d, %f, %f, %f\n", unixTime, ping, upload, download)
-
 		PingData.DataPoints = append(PingData.DataPoints, DataPoint{
 			X: unixTime,
 			Y: ping,
