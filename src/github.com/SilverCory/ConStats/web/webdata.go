@@ -12,6 +12,7 @@ type Data struct {
 	DataPoints []DataPoint `json:"dataPoints"`
 	XValueType string      `json:"xValueType"`
 	Name       string      `json:"name"`
+	Unit       string      `json:"unit"`
 }
 
 type DataPoint struct {
@@ -37,6 +38,7 @@ func GenerateData(storage *sql.MySQL) (*[]Data, error) {
 		Type:       "line",
 		XValueType: "dateTime",
 		Name:       "Ping",
+		Unit:       "ms",
 		DataPoints: make([]DataPoint, 0),
 	}
 
@@ -44,6 +46,7 @@ func GenerateData(storage *sql.MySQL) (*[]Data, error) {
 		Type:       "line",
 		XValueType: "dateTime",
 		Name:       "Up",
+		Unit:       "mbps",
 		DataPoints: make([]DataPoint, 0),
 	}
 
@@ -51,6 +54,7 @@ func GenerateData(storage *sql.MySQL) (*[]Data, error) {
 		Type:       "line",
 		XValueType: "dateTime",
 		Name:       "Down",
+		Unit:       "mbps",
 		DataPoints: make([]DataPoint, 0),
 	}
 
