@@ -11,7 +11,7 @@ You need to compile it, it's go so it's not that hard..
 Literially 
 
 0. ```sudo apt-get install speedtest-cli```
-1. ```github.com/go-sql-driver/mysql```
+1. ```go get github.com/go-sql-driver/mysql```
 2. ```go build main.go```
 
 
