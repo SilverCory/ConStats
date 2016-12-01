@@ -36,21 +36,21 @@ func GenerateData(storage *sql.MySQL) (*[]Data, error) {
 	PingData := Data{
 		Type:       "line",
 		XValueType: "dateTime",
-		Name:       "Ping (ms)",
+		Name:       "Ping",
 		DataPoints: make([]DataPoint, 0),
 	}
 
 	UploadData := Data{
 		Type:       "line",
 		XValueType: "dateTime",
-		Name:       "Up (mbps)",
+		Name:       "Up",
 		DataPoints: make([]DataPoint, 0),
 	}
 
 	DownloadData := Data{
 		Type:       "line",
 		XValueType: "dateTime",
-		Name:       "Down (mbps)",
+		Name:       "Down",
 		DataPoints: make([]DataPoint, 0),
 	}
 
