@@ -14,9 +14,10 @@ import (
 
 // Configuration - The main configuration for ConStats
 type Configuration struct {
-	Command string
-	Args    []string
-	MySQL   *MySQLConfiguration
+	Command          string
+	Args             []string
+	IntervalMinuites int
+	MySQL            *MySQLConfiguration
 }
 
 // MySQLConfiguration - MySQL part..
@@ -25,8 +26,9 @@ type MySQLConfiguration struct {
 }
 
 var defaultConfiguration = &Configuration{
-	Command: "./speedtest",
-	Args:    []string{"--json", "--secure"},
+	Command:          "./speedtest",
+	Args:             []string{"--json", "--secure"},
+	IntervalMinuites: 15,
 	MySQL: &MySQLConfiguration{
 		Host: "user:password@/dbname",
 	},
@@ -80,7 +82,7 @@ func main() {
 
 	doTest(speed, mysqlStorage)
 
-	ticker := time.NewTicker(15 * time.Minute)
+	ticker := time.NewTicker(time.Duration(CurrentConfig.IntervalMinuites) * time.Minute)
 
 	// Infinite loop..
 	for {
