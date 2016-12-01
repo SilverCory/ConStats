@@ -8,11 +8,12 @@ import (
 )
 
 type Data struct {
-	Type       string      `json:"type"`
-	DataPoints []DataPoint `json:"dataPoints"`
-	XValueType string      `json:"xValueType"`
-	Name       string      `json:"name"`
-	Unit       string      `json:"unit"`
+	Type         string      `json:"type"`
+	DataPoints   []DataPoint `json:"dataPoints"`
+	XValueType   string      `json:"xValueType"`
+	Name         string      `json:"name"`
+	Unit         string      `json:"unit"`
+	ShowInLegend bool        `json:"showInLegend"`
 }
 
 type DataPoint struct {
@@ -35,27 +36,30 @@ func (t rawTime) Time() (interface{}, error) {
 func GenerateData(storage *sql.MySQL) (*[]Data, error) {
 
 	PingData := Data{
-		Type:       "line",
-		XValueType: "dateTime",
-		Name:       "Ping",
-		Unit:       "ms",
-		DataPoints: make([]DataPoint, 0),
+		Type:         "line",
+		XValueType:   "dateTime",
+		Name:         "Ping",
+		Unit:         "ms",
+		DataPoints:   make([]DataPoint, 0),
+		ShowInLegend: true,
 	}
 
 	UploadData := Data{
-		Type:       "line",
-		XValueType: "dateTime",
-		Name:       "Up",
-		Unit:       "mbps",
-		DataPoints: make([]DataPoint, 0),
+		Type:         "line",
+		XValueType:   "dateTime",
+		Name:         "Up",
+		Unit:         "mbps",
+		DataPoints:   make([]DataPoint, 0),
+		ShowInLegend: true,
 	}
 
 	DownloadData := Data{
-		Type:       "line",
-		XValueType: "dateTime",
-		Name:       "Down",
-		Unit:       "mbps",
-		DataPoints: make([]DataPoint, 0),
+		Type:         "line",
+		XValueType:   "dateTime",
+		Name:         "Down",
+		Unit:         "mbps",
+		DataPoints:   make([]DataPoint, 0),
+		ShowInLegend: true,
 	}
 
 	rows, err := storage.Load()
