@@ -4,7 +4,7 @@ pkg/
 main
 
 ### Project files
-speedtest
+speedtest.py
 config.json
 
 ### Eclipse template
