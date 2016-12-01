@@ -7,6 +7,7 @@ import (
 	"github.com/SilverCory/ConStats/sql"
 )
 
+// Data the data to show.
 type Data struct {
 	Type         string      `json:"type"`
 	DataPoints   []DataPoint `json:"dataPoints"`
@@ -16,6 +17,7 @@ type Data struct {
 	ShowInLegend bool        `json:"showInLegend"`
 }
 
+// DataPoint the point of data to display.
 type DataPoint struct {
 	X interface{} `json:"x"`
 	Y interface{} `json:"y"`
@@ -33,6 +35,7 @@ func (t rawTime) Time() (interface{}, error) {
 
 }
 
+// GenerateData generates the data statistics.
 func GenerateData(storage *sql.MySQL) (*[]Data, error) {
 
 	PingData := Data{

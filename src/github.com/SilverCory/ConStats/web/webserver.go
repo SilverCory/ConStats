@@ -5,6 +5,7 @@ import (
 	"net/http"
 )
 
+// RunWebserver Runs the server.
 func RunWebserver(host string) {
 	http.HandleFunc("/", rootHandler)
 	http.HandleFunc("/connectionData.json", dataHandler)
