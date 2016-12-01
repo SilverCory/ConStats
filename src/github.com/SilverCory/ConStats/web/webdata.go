@@ -11,6 +11,7 @@ type Data struct {
 	Type       string      `json:"type"`
 	DataPoints []DataPoint `json:"dataPoints"`
 	XValueType string      `json:"xValueType"`
+	Name       string      `json:"name"`
 }
 
 type DataPoint struct {
@@ -35,18 +36,21 @@ func GenerateData(storage *sql.MySQL) (*[]Data, error) {
 	PingData := Data{
 		Type:       "line",
 		XValueType: "dateTime",
+		Name:       "Ping (ms)",
 		DataPoints: make([]DataPoint, 0),
 	}
 
 	UploadData := Data{
 		Type:       "line",
 		XValueType: "dateTime",
+		Name:       "Up (mbps)",
 		DataPoints: make([]DataPoint, 0),
 	}
 
 	DownloadData := Data{
 		Type:       "line",
 		XValueType: "dateTime",
+		Name:       "Down (mbps)",
 		DataPoints: make([]DataPoint, 0),
 	}
 
