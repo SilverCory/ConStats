@@ -57,7 +57,7 @@ func main() {
 
 	doTest(speed, mysqlStorage)
 	if _, err := os.Stat("./connectionData.json"); os.IsNotExist(err) {
-		doData(mysqlStorage)
+		doData(CurrentConfig.WebData.CreateWebData, mysqlStorage)
 	}
 
 	ticker := time.NewTicker(time.Duration(CurrentConfig.IntervalMinuites) * time.Minute)
