@@ -6,6 +6,7 @@ main
 ### Project files
 speedtest.py
 config.json
+connectionData.json
 
 ### Eclipse template
 *.pydevproject

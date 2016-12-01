@@ -23,7 +23,7 @@ const (
 		"PRIMARY KEY (`time`)," +
 		"UNIQUE INDEX `time_UNIQUE` (`time` ASC));"
 
-	insertStmt = "INSERT INTO `constats`.`stats` (`time`, `ping`, `upload`, `download`) VALUES (?, ?, ?, ?);"
+	insertStmt = "INSERT INTO `stats` (`time`, `ping`, `upload`, `download`) VALUES (?, ?, ?, ?);"
 )
 
 // Create creates an instance
@@ -65,5 +65,21 @@ func (m *MySQL) Save(result *speedtest.TestResult, parsedTime *time.Time) error 
 	}
 
 	return err
+
+}
+
+func (m *MySQL) Load() (*sql.Rows, error) {
+
+	db, err := m.createConn()
+	if err != nil {
+		return nil, err
+	}
+
+	stats, err := db.Query("SELECT * FROM `stats` LIMIT 3000")
+	if err != nil {
+		return stats, err
+	}
+
+	return stats, nil
 
 }
