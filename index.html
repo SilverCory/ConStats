@@ -10,7 +10,6 @@
 	<script type="text/javascript">
 	   var connectionData = {}
 	   var chart = {}
-	   setInterval( $.getJSON('/connectionData.json', function (newData) { chart.options.data = newData; chart.render() }), 60 * 1000 * 5 )
 	   $(document).ready(function() {
 	     $.getJSON( '/connectionData.json', function (data) { connectionData = data; } ).done( function () {
 	        chart = new CanvasJS.Chart('chartContainer',
@@ -31,6 +30,7 @@
 	         data: connectionData
 	       });
 	       chart.render();
+		   setInterval( $.getJSON('/connectionData.json', function (newData) { chart.options.data = newData; chart.render() }), 60 * 1000 * 5 );
 	     });
 	 });
 	</script>
