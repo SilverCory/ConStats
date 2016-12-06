@@ -4,6 +4,10 @@ import (
 	"fmt"
 	"time"
 
+	"strings"
+
+	"strconv"
+
 	"github.com/SilverCory/ConStats/sql"
 )
 
@@ -19,51 +23,40 @@ type Data struct {
 
 // DataPoint the point of data to display.
 type DataPoint struct {
-	X interface{} `json:"x"`
-	Y interface{} `json:"y"`
+	TimePoint int
+	Ping      float32
+	Upload    float32
+	Download  float32
 }
 
 type rawTime []byte
 
-func (t rawTime) Time() (interface{}, error) {
+func (t rawTime) Time() (string, error) {
 	timeOut, err := time.Parse("2006-01-02 15:04:05", string(t))
 	if err != nil {
-		return -1, err
+		return "", err
 	}
 
-	return timeOut.Unix() * 1000, nil
+	stringDate := timeOut.Format("Date(2006,01,02,15,04,05)")
+
+	// Prepare for fucking gross shit.
+	dateParts := strings.Split(stringDate, ",")
+
+	monthInt, err := strconv.Atoi(dateParts[1])
+	if err != nil {
+		return "", err
+	}
+
+	dateParts[1] = strconv.Itoa(monthInt - 1)
+
+	return strings.Join(dateParts, ","), err
 
 }
 
 // GenerateData generates the data statistics.
-func GenerateData(storage *sql.MySQL) (*[]Data, error) {
+func GenerateData(storage *sql.MySQL) ([]interface{}, error) {
 
-	PingData := Data{
-		Type:         "line",
-		XValueType:   "dateTime",
-		Name:         "Ping",
-		Unit:         "ms",
-		DataPoints:   make([]DataPoint, 0),
-		ShowInLegend: true,
-	}
-
-	UploadData := Data{
-		Type:         "line",
-		XValueType:   "dateTime",
-		Name:         "Up",
-		Unit:         "mbps",
-		DataPoints:   make([]DataPoint, 0),
-		ShowInLegend: true,
-	}
-
-	DownloadData := Data{
-		Type:         "line",
-		XValueType:   "dateTime",
-		Name:         "Down",
-		Unit:         "mbps",
-		DataPoints:   make([]DataPoint, 0),
-		ShowInLegend: true,
-	}
+	interaceArray := make([]interface{}, 0)
 
 	rows, err := storage.Load()
 	if err != nil {
@@ -97,22 +90,10 @@ func GenerateData(storage *sql.MySQL) (*[]Data, error) {
 			download = download / 1000000
 		}
 
-		PingData.DataPoints = append(PingData.DataPoints, DataPoint{
-			X: unixTime,
-			Y: ping,
-		})
-		UploadData.DataPoints = append(UploadData.DataPoints, DataPoint{
-			X: unixTime,
-			Y: upload,
-		})
-
-		DownloadData.DataPoints = append(DownloadData.DataPoints, DataPoint{
-			X: unixTime,
-			Y: download,
-		})
+		interaceArray = append(interaceArray, []interface{}{unixTime, ping, upload, download})
 
 	}
 
-	return &[]Data{PingData, UploadData, DownloadData}, nil
+	return interaceArray, nil
 
 }
