@@ -3,6 +3,7 @@ package speedtest
 import (
 	"encoding/json"
 	"os/exec"
+	"strings"
 )
 
 // SpeedTest the speed test instance
@@ -37,6 +38,10 @@ func (s *SpeedTest) Test() (*TestResult, error) {
 
 	result := &TestResult{}
 	err = json.Unmarshal(out, result)
+
+	if result.TimeStamp != "" && len(strings.Split(result.TimeStamp, "Z")) < 1 {
+		result.TimeStamp = result.TimeStamp + "Z"
+	}
 
 	return result, err
 

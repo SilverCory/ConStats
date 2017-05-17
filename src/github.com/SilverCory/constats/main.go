@@ -182,7 +182,7 @@ func doTest(speed *speedtest.SpeedTest, storage *sql.MySQL, table string) {
 		return
 	}
 
-	runTime, err := time.Parse("2006-01-02T15:04:05.999999999", result.TimeStamp)
+	runTime, err := time.Parse(time.RFC3339, result.TimeStamp)
 	if err != nil {
 		fmt.Println("An error occured: ", err)
 		storage.Save(nil, nil, table)
