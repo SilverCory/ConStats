@@ -1,15 +1,15 @@
 package main
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
-	"github.com/SilverCory/constats/speedtest"
-	"github.com/SilverCory/constats/sql"
-	"github.com/SilverCory/constats/web"
 	"io/ioutil"
 	"os"
 	"time"
+
+	"github.com/SilverCory/constats/speedtest"
+	"github.com/SilverCory/constats/sql"
+	"github.com/SilverCory/constats/web"
 )
 
 // Configuration - The main configuration for ConStats

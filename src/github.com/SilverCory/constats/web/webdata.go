@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SilverCory/Constats/sql"
+	"github.com/SilverCory/constats/sql"
 )
 
 // Data the data to show.
