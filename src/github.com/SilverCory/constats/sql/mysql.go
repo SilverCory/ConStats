@@ -7,6 +7,7 @@ import (
 
 	"github.com/SilverCory/constats/speedtest"
 	_ "github.com/go-sql-driver/mysql"
+	"strings"
 )
 
 // MySQL instance
@@ -15,7 +16,7 @@ type MySQL struct {
 }
 
 const (
-	tableInit = "CREATE TABLE IF NOT EXISTS ? (\n" +
+	tableInit = "CREATE TABLE IF NOT EXISTS {TABLE_NAME} (" +
 		"`time` DATETIME NOT NULL DEFAULT NOW()," +
 		"`ping` FLOAT NOT NULL DEFAULT 0," +
 		"`upload` INT NOT NULL DEFAULT 0," +
@@ -34,18 +35,16 @@ func Create() *MySQL {
 }
 
 func (m *MySQL) createConn(table string) (*sql.DB, error) {
-	db, err := sql.Open("sql", m.Host)
+	db, err := sql.Open("mysql", m.Host)
 	if err != nil {
 		return db, err
 	}
 
 	if table != "" {
-		stmt, err := db.Prepare(tableInit)
+		_, err := db.Exec(strings.Replace(tableInit, "{TABLE_NAME}", "`"+table+"`", 1))
 		if err != nil {
 			return db, err
 		}
-
-		stmt.Exec(table)
 	}
 
 	return db, err

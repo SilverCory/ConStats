@@ -7,8 +7,7 @@ import (
 
 // RunWebserver Runs the server.
 func RunWebserver(host string) {
-	http.FileServer(http.Dir("./data/"))
-	err := http.ListenAndServe(host, nil)
+	err := http.ListenAndServe(host, http.FileServer(http.Dir("./data/")))
 	if err != nil {
 		fmt.Println("An error occured whilst running the webserver..", err)
 	}

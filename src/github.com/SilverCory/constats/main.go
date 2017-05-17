@@ -10,6 +10,7 @@ import (
 	"github.com/SilverCory/constats/speedtest"
 	"github.com/SilverCory/constats/sql"
 	"github.com/SilverCory/constats/web"
+	"log"
 )
 
 // Configuration - The main configuration for ConStats
@@ -144,6 +145,8 @@ func doData(createData bool, storage *sql.MySQL, table string, fetchAll bool) {
 
 	for _, table = range createTables {
 
+		start := time.Now()
+
 		data, err := web.GenerateData(storage, table)
 		if err != nil {
 			fmt.Println("There was an error generating webdata for table "+table+"!", err)
@@ -156,11 +159,15 @@ func doData(createData bool, storage *sql.MySQL, table string, fetchAll bool) {
 			continue
 		}
 
-		err = ioutil.WriteFile("connectionData"+table+".json", fileData, 0644)
+		err = ioutil.WriteFile("./data/connectionData_"+table+".json", fileData, 0644)
 		if err != nil {
 			fmt.Println("There was an error generating webdata for table "+table+"!", err)
 			continue
 		}
+
+		elapsed := time.Since(start)
+		log.Printf("Data generation took %s for %q", elapsed, table)
+
 	}
 }
 
