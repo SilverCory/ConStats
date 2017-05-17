@@ -24,7 +24,7 @@ const (
 		"PRIMARY KEY (`time`)," +
 		"UNIQUE INDEX `time_UNIQUE` (`time` ASC));"
 
-	insertStmt = "INSERT INTO ? (`time`, `ping`, `upload`, `download`) VALUES (?, ?, ?, ?);"
+	insertStmt = "INSERT INTO {TABLE_NAME} (`time`, `ping`, `upload`, `download`) VALUES (?, ?, ?, ?);"
 )
 
 // Create creates an instance
@@ -41,13 +41,16 @@ func (m *MySQL) createConn(table string) (*sql.DB, error) {
 	}
 
 	if table != "" {
-		_, err := db.Exec(strings.Replace(tableInit, "{TABLE_NAME}", "`"+table+"`", 1))
+		_, err := db.Exec(replaceTable(tableInit, table))
 		if err != nil {
 			return db, err
 		}
 	}
 
 	return db, err
+}
+func replaceTable(input string, tableName string) string {
+	return strings.Replace(input, "{TABLE_NAME}", "`"+tableName+"`", 1)
 }
 
 // Save saves the data provided or negatives if nil.
@@ -60,15 +63,15 @@ func (m *MySQL) Save(result *speedtest.TestResult, parsedTime *time.Time, table 
 
 	defer db.Close()
 
-	stmt, err := db.Prepare(insertStmt)
+	stmt, err := db.Prepare(replaceTable(insertStmt, table))
 	if err != nil {
 		return err
 	}
 
 	if result == nil && parsedTime == nil {
-		stmt.Exec(time.Now(), -1, -1, -1)
+		_, err = stmt.Exec(time.Now(), -1, -1, -1)
 	} else {
-		_, err = stmt.Exec(table, parsedTime, result.Ping, result.Upload, result.Download)
+		_, err = stmt.Exec(parsedTime, result.Ping, result.Upload, result.Download)
 	}
 
 	return err
