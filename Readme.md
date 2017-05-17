@@ -9,7 +9,7 @@ You need to compile it, it's go so it's not that hard..
 Literially
 
 0. ```sudo apt-get install speedtest-cli```
-1. ```cd src/cory.red/constats && glide install```
+1. ```cd src/github.com/constats && glide install```
 2. ```go build main.go```
 3. ```./main or whatever.```
 3. configure...

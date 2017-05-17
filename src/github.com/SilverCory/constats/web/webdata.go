@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"cory.red/constats/sql"
+	"github.com/SilverCory/Constats/sql"
 )
 
 // Data the data to show.

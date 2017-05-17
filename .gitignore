@@ -454,3 +454,7 @@ $RECYCLE.BIN/
 *.lnk
 ### VisualStudioCode template
 .settings
+
+glide.lock
+vendor
+config.json

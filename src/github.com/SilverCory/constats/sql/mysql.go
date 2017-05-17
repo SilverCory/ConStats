@@ -2,10 +2,10 @@ package sql
 
 import (
 	"database/sql"
+	"fmt"
 	"time"
 
-	"cory.red/constats/speedtest"
-	"fmt"
+	"github.com/SilverCory/constats/speedtest"
 	_ "github.com/go-sql-driver/mysql"
 )
 
