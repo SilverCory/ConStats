@@ -2,13 +2,11 @@ package web
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 	"time"
 
-	"strings"
-
-	"strconv"
-
-	"github.com/SilverCory/ConStats/sql"
+	"cory.red/constats/sql"
 )
 
 // Data the data to show.
@@ -54,11 +52,11 @@ func (t rawTime) Time() (string, error) {
 }
 
 // GenerateData generates the data statistics.
-func GenerateData(storage *sql.MySQL) ([]interface{}, error) {
+func GenerateData(storage *sql.MySQL, table string) ([]interface{}, error) {
 
 	interaceArray := make([]interface{}, 0)
 
-	rows, err := storage.Load()
+	rows, err := storage.Load(table)
 	if err != nil {
 		return nil, err
 	}

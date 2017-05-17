@@ -7,8 +7,19 @@
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js" type="text/javascript"></script>
     <script type="text/javascript">
-        var connectionData = {}
-            //var chart = {}
+
+        var charts = [];
+
+        function loadCharts() {
+
+            $('.chartContainer').each(function() {
+                var name = this.id;
+                $.getJSON('/connectionData_' + name + '.json', function(data) {
+                    drawChart(name, data);
+                });
+            });
+
+        }
 
         function prepend(value, array) {
             var newArray = array.slice(0);
@@ -16,7 +27,7 @@
             return newArray;
         }
 
-        function drawChart() {
+        function drawChart(name, jsonData) {
             var headers = [{
                 label: 'X',
                 id: 'X',
@@ -34,7 +45,7 @@
                 id: 'Down',
                 type: 'number'
             }];
-            var data = google.visualization.arrayToDataTable(prepend(headers, connectionData))
+            var data = google.visualization.arrayToDataTable(prepend(headers, jsonData))
             var options = {
                 hAxis: {
                     title: 'Time'
@@ -42,28 +53,25 @@
                 vAxis: {
                     title: 'Internet Health'
                 },
-				focusTarget: 'category'
+                focusTarget: 'category'
             };
 
-            var chart = new google.visualization.LineChart(document.getElementById('chartContainer'));
+            var chart = undefined;
+            if ( charts[name] === undefined ) {
+                chart = new google.visualization.LineChart(document.getElementById(name));
+                charts[name] = chart;
+            } else {
+                chart = charts[name];
+            }
             chart.draw(data, options);
         }
 
         $(document).ready(function() {
-            $.getJSON('/connectionData.json', function(data) {
-                connectionData = data;
-            }).done(function() {
-                google.charts.load('current', {
-                    packages: ['corechart', 'line']
-                });
-                google.charts.setOnLoadCallback(drawChart);
-
-                setInterval($.getJSON('/connectionData.json', function(newData) {
-                    connectionData = newData;
-                    drawChart();
-                }), 60 * 1000 * 5);
-
+            google.charts.setOnLoadCallback(loadCharts);
+            google.charts.load('current', {
+                packages: ['corechart', 'line']
             });
+            setInterval(loadCharts, 60 * 1000 * 5);
         });
     </script>
 
@@ -72,8 +80,8 @@
 </head>
 
 <body>
-    <div id="chartContainer" style="height: 100%; width: 100%;">
-    </div>
+<div id="my-computer-home" class="chartContainer" style="height: 100%; width: 100%;">
+</div>
 </body>
 
 </html>

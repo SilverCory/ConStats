@@ -1,0 +1,4 @@
+package: cory.red/constats
+import:
+- package: github.com/go-sql-driver/sql
+  version: ^1.3.0

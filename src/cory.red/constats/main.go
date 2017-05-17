@@ -5,16 +5,16 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-
 	"time"
 
-	"github.com/SilverCory/ConStats/speedtest"
-	"github.com/SilverCory/ConStats/sql"
-	"github.com/SilverCory/ConStats/web"
+	"cory.red/constats/speedtest"
+	"cory.red/constats/sql"
+	"cory.red/constats/web"
 )
 
 // Configuration - The main configuration for ConStats
 type Configuration struct {
+	MyTable          string
 	Command          string
 	Args             []string
 	IntervalMinuites int
@@ -23,9 +23,10 @@ type Configuration struct {
 }
 
 type WebDataConfiguration struct {
-	CreateWebData bool
-	RunServer     bool
-	Host          string
+	CreateWebData  bool
+	RunServer      bool
+	Host           string
+	FetchAllTables bool
 }
 
 // MySQLConfiguration - MySQL part..
@@ -34,6 +35,7 @@ type MySQLConfiguration struct {
 }
 
 var defaultConfiguration = &Configuration{
+	MyTable:          "my-computer-home",
 	Command:          "./speedtest",
 	Args:             []string{"--json", "--secure"},
 	IntervalMinuites: 15,
@@ -41,9 +43,10 @@ var defaultConfiguration = &Configuration{
 		Host: "user:password@/dbname",
 	},
 	WebData: &WebDataConfiguration{
-		CreateWebData: true,
-		RunServer:     true,
-		Host:          ":8080",
+		CreateWebData:  true,
+		RunServer:      true,
+		Host:           ":8080",
+		FetchAllTables: false,
 	},
 }
 
@@ -63,10 +66,8 @@ func main() {
 		go web.RunWebserver(CurrentConfig.WebData.Host)
 	}
 
-	doTest(speed, mysqlStorage)
-	if _, err := os.Stat("./connectionData.json"); os.IsNotExist(err) {
-		doData(CurrentConfig.WebData.CreateWebData, mysqlStorage)
-	}
+	doTest(speed, mysqlStorage, CurrentConfig.MyTable)
+	doData(CurrentConfig.WebData.CreateWebData, mysqlStorage, CurrentConfig.MyTable, CurrentConfig.WebData.FetchAllTables)
 
 	ticker := time.NewTicker(time.Duration(CurrentConfig.IntervalMinuites) * time.Minute)
 
@@ -74,8 +75,8 @@ func main() {
 	for {
 		select {
 		case <-ticker.C:
-			doTest(speed, mysqlStorage)
-			doData(CurrentConfig.WebData.CreateWebData, mysqlStorage) // Yes, this makes the data every {interval} mins.. 3000 each go. Deal with it.
+			doTest(speed, mysqlStorage, CurrentConfig.MyTable)
+			doData(CurrentConfig.WebData.CreateWebData, mysqlStorage, CurrentConfig.MyTable, CurrentConfig.WebData.FetchAllTables) // Yes, this makes the data every {interval} mins.. 3000 each go. Deal with it.
 		}
 	}
 
@@ -114,48 +115,70 @@ func checkConfig(currentConfig *Configuration) {
 		}
 
 	}
+
+	currentConfig.MyTable = "constats_" + currentConfig.MyTable
+
 }
 
-func doData(createData bool, storage *sql.MySQL) {
+func doData(createData bool, storage *sql.MySQL, table string, fetchAll bool) {
 
 	if !createData {
 		return
 	}
 
-	data, err := web.GenerateData(storage)
-	if err != nil {
-		fmt.Println("There was an error generating webdata!", err)
-		return
+	var (
+		createTables []string
+		err          error
+	)
+
+	if fetchAll {
+		createTables, err = storage.FindTables()
+		if err != nil {
+			fmt.Println("Unable to find tables!", err)
+			return
+		}
+	} else {
+		createTables = make([]string, 1)
+		createTables[0] = table
 	}
 
-	fileData, err := json.MarshalIndent(data, "", "\t")
-	if err != nil {
-		fmt.Println("There was an error generating webdata!", err)
-		return
-	}
+	for _, table = range createTables {
 
-	err = ioutil.WriteFile("connectionData.json", fileData, 0644)
-	if err != nil {
-		fmt.Println("There was an error generating webdata!", err)
-		return
+		data, err := web.GenerateData(storage, table)
+		if err != nil {
+			fmt.Println("There was an error generating webdata for table "+table+"!", err)
+			continue
+		}
+
+		fileData, err := json.MarshalIndent(data, "", "\t")
+		if err != nil {
+			fmt.Println("There was an error generating webdata for table "+table+"!", err)
+			continue
+		}
+
+		err = ioutil.WriteFile("connectionData"+table+".json", fileData, 0644)
+		if err != nil {
+			fmt.Println("There was an error generating webdata for table "+table+"!", err)
+			continue
+		}
 	}
 }
 
-func doTest(speed *speedtest.SpeedTest, storage *sql.MySQL) {
+func doTest(speed *speedtest.SpeedTest, storage *sql.MySQL, table string) {
 
 	fmt.Println("Starting speed test...")
 
 	result, err := speed.Test()
 	if err != nil {
 		fmt.Println("An error occured: ", err)
-		storage.Save(nil, nil)
+		storage.Save(nil, nil, table)
 		return
 	}
 
 	runTime, err := time.Parse("2006-01-02T15:04:05.999999999", result.TimeStamp)
 	if err != nil {
 		fmt.Println("An error occured: ", err)
-		storage.Save(nil, nil)
+		storage.Save(nil, nil, table)
 		return
 	}
 
@@ -165,7 +188,7 @@ func doTest(speed *speedtest.SpeedTest, storage *sql.MySQL) {
 	fmt.Printf("Download    : %.0f\n", result.Download)
 
 	fmt.Println("=================== Saving to SQL ===================")
-	err = storage.Save(result, &runTime)
+	err = storage.Save(result, &runTime, table)
 	if err != nil {
 		fmt.Println("An error occured: ", err)
 	} else {
